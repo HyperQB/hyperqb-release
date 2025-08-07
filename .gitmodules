@@ -1,0 +1,6 @@
+[submodule "hyperqb-ui"]
+	path = hyperqb-ui
+	url = https://github.com/HyperQB/hyperqb-ui.git
+[submodule "HyperRUSTY"]
+	path = HyperRUSTY
+	url = https://github.com/HyperQB/HyperRUSTY.git

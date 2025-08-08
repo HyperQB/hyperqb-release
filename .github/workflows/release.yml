@@ -93,16 +93,16 @@ jobs:
           cd hyperqb-ui
           flutter pub get
 
+      - name: Build Flutter macOS app
+        run: |
+          cd hyperqb-ui
+          flutter build macos
+
       - name: Copy binary to assets
         run: |
           mkdir -p hyperqb-ui/assets/bin/
           cp HyperRUSTY/target/release/sim hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/sim
           chmod +x hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/sim
-
-      - name: Build Flutter macOS app
-        run: |
-          cd hyperqb-ui
-          flutter build macos
 
       - name: Zip App Bundle
         run: |

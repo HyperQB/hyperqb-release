@@ -1,0 +1,91 @@
+name: Build & Release HyperQB
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build-release:
+    runs-on: macos-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Z3 (static build)
+        run: |
+          git clone https://github.com/Z3Prover/z3.git z3
+          cd z3
+          python3 scripts/mk_make.py --prefix=/usr/local --staticlib
+          cd build
+          make -j$(sysctl -n hw.ncpu)
+          sudo make install
+          cd ../..
+          ls -la /usr/local/lib/libz3*
+
+      - name: Set environment for static linking
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/lib/pkgconfig" >> $GITHUB_ENV
+          echo "Z3_SYS_Z3_HEADER=/usr/local/include/z3.h" >> $GITHUB_ENV
+          echo "Z3_STATIC=1" >> $GITHUB_ENV
+          echo "PKG_CONFIG_ALL_STATIC=1" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=" >> $GITHUB_ENV
+
+      - name: Build binary (static)
+        run: |
+          cd HyperRUSTY
+          cargo build --release
+
+      - name: Verify static linking
+        run: |
+          if otool -L HyperRUSTY/target/release/sim | grep -q libz3.dylib; then
+            echo "ERROR: Binary is dynamically linked to Z3"
+            exit 1
+          else
+            echo "Z3 statically linked"
+          fi
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.32.8"
+
+      - name: Set up Flutter UI
+        run: |
+          cd hyperqb-ui
+          flutter pub get
+
+      - name: Copy binary to assets
+        run: |
+          mkdir -p hyperqb-ui/assets/bin/
+          cp HyperRUSTY/target/release/sim hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/sim
+          chmod +x hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/sim
+
+      - name: Build Flutter macOS app
+        run: |
+          cd hyperqb-ui
+          flutter build macos
+
+      - name: Zip App Bundle
+        run: |
+          cd hyperqb-ui/build/macos/Build/Products/Release/
+          zip -r HyperQB-macos.zip HyperQB.app
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "HyperQB Release ${{ github.ref_name }}"
+          tag_name: ${{ github.ref_name }}
+          files: hyperqb-ui/build/macos/Build/Products/Release/HyperQB-macos.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

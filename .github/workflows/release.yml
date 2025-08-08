@@ -22,16 +22,40 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache Z3 installation
+        id: cache-z3
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/lib/libz3*
+            /usr/local/include/z3*
+            /usr/local/lib/pkgconfig/z3.pc
+          key: z3-static-${{ runner.os }}-${{ hashFiles('**/z3-version.txt') }}
+          restore-keys: |
+            z3-static-${{ runner.os }}-
+
       - name: Install Z3 (static build)
+        if: steps.cache-z3.outputs.cache-hit != 'true'
         run: |
           git clone https://github.com/Z3Prover/z3.git z3
           cd z3
+          # Pin to a specific commit/tag
+          git checkout z3-4.13.0
+          echo "z3-4.13.0" > ../z3-version.txt
           python3 scripts/mk_make.py --prefix=/usr/local --staticlib
           cd build
           make -j$(sysctl -n hw.ncpu)
           sudo make install
           cd ../..
+          # Verify static library exists
+          ls -la /usr/local/lib/libz3.a
+          # Remove any dynamic libraries to force static linking
+          sudo rm -f /usr/local/lib/libz3.dylib* || true
           ls -la /usr/local/lib/libz3*
+
+      - name: Create Z3 version file (for cache key)
+        if: steps.cache-z3.outputs.cache-hit == 'true'
+        run: echo "z3-4.13.0" > z3-version.txt
 
       - name: Set environment for static linking
         run: |
@@ -48,12 +72,16 @@ jobs:
 
       - name: Verify static linking
         run: |
-          if otool -L HyperRUSTY/target/release/sim | grep -q libz3.dylib; then
-            echo "ERROR: Binary is dynamically linked to Z3"
+          echo "=== Checking for dynamic Z3 dependencies ==="
+          if otool -L HyperRUSTY/target/release/sim | grep -v "HyperRUSTY/target/release/sim:" | grep -i z3; then
+            echo "ERROR: Binary has Z3 dynamic dependencies:"
+            otool -L HyperRUSTY/target/release/sim | grep -i z3
             exit 1
           else
-            echo "Z3 statically linked"
+            echo "No Z3 dynamic dependencies found - binary is statically linked"
           fi
+          echo "=== Full dependency list ==="
+          otool -L HyperRUSTY/target/release/sim
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2

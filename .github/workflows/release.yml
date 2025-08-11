@@ -104,29 +104,16 @@ jobs:
           cp HyperRUSTY/target/release/sim hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/sim
           chmod +x hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/sim
 
-      - name: Install create-dmg
-        run: brew install create-dmg
-
-      - name: Create DMG
+      - name: Zip App Bundle
         run: |
           cd hyperqb-ui/build/macos/Build/Products/Release/
-          create-dmg \
-            --volname "HyperQB" \
-            --window-pos 200 120 \
-            --window-size 600 400 \
-            --icon-size 100 \
-            --icon "hyperqb.app" 175 190 \
-            --hide-extension "hyperqb.app" \
-            --app-drop-link 425 190 \
-            --hdiutil-quiet \
-            "HyperQB-macos.dmg" \
-            .
+          zip -r HyperQB-macos.zip HyperQB.app
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: "HyperQB Release ${{ github.ref_name }}"
           tag_name: ${{ github.ref_name }}
-          files: hyperqb-ui/build/macos/Build/Products/Release/HyperQB-macos.dmg
+          files: hyperqb-ui/build/macos/Build/Products/Release/HyperQB-macos.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

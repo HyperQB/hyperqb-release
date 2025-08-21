@@ -16,7 +16,7 @@ jobs:
       - name: Checkout with submodules
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: true
           token: ${{ secrets.PAT_TOKEN }}
 
       - name: Install Rust

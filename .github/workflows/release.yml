@@ -13,15 +13,20 @@ jobs:
         shell: bash
 
     steps:
-      - name: Checkout with submodules
+      - name: Checkout repo
         uses: actions/checkout@v4
         with:
           submodules: false
+          fetch-depth: 0
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: Init only necessary submodules
+      - name: Configure submodule credentials
         run: |
-          git submodule update --init -- hyperqb-ui HyperRUSTY
+          git config --global url."https://${{ secrets.PAT_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
+      - name: Init only needed submodules
+        run: |
+          git submodule update --init -- HyperRUSTY hyperqb-ui
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable

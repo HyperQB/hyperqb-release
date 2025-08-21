@@ -71,6 +71,21 @@ jobs:
           echo "PKG_CONFIG_ALL_STATIC=1" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=" >> $GITHUB_ENV
 
+      - name: Debug submodule contents
+        run: |
+          echo "=== Current directory ==="
+          pwd
+          ls -la
+
+          echo "=== HyperRUSTY directory contents ==="
+          ls -la HyperRUSTY/
+
+          echo "=== Looking for Cargo.toml ==="
+          find . -name "Cargo.toml" -type f
+
+          echo "=== Git submodule status ==="
+          git submodule status
+
       - name: Build binary (static)
         run: |
           cd HyperRUSTY

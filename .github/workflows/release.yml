@@ -16,8 +16,14 @@ jobs:
       - name: Checkout with submodules
         uses: actions/checkout@v4
         with:
-          submodules: true
           token: ${{ secrets.PAT_TOKEN }}
+
+      # Don't pull autohyper
+      - name: Initialize only needed submodules
+        run: |
+          # Initialize only the submodules we need
+          git submodule update --init HyperRUSTY hyperqb-ui
+        continue-on-error: true
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable

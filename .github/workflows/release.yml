@@ -104,6 +104,21 @@ jobs:
           cp HyperRUSTY/target/release/sim hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/sim
           chmod +x hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/sim
 
+      - name: Download and install oss-cad-suite
+        run: |
+          # Download the macOS version of oss-cad-suite
+          wget https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2025-08-20/oss-cad-suite-darwin-x64-20250820.tgz
+          # Extract it
+          tar -xzf oss-cad-suite-darwin-x64-20250820.tgz
+          # Clean up the downloaded archive
+          rm oss-cad-suite-darwin-x64-20250820.tgz
+
+      - name: Copy oss-cad-suite to app bundle
+        run: |
+          # Create the directory structure if it doesn't exist
+          # Copy the entire oss-cad-suite directory to the app bundle
+          cp -r oss-cad-suite hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/
+
       - name: Zip App Bundle
         run: |
           cd hyperqb-ui/build/macos/Build/Products/Release/

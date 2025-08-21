@@ -16,14 +16,23 @@ jobs:
       - name: Checkout with submodules
         uses: actions/checkout@v4
         with:
+          submodules: true
           token: ${{ secrets.PAT_TOKEN }}
 
-      # Don't pull autohyper
-      - name: Initialize only needed submodules
+      - name: Clean up HyperRUSTY submodules
         run: |
-          # Initialize only the submodules we need
-          git submodule update --init HyperRUSTY hyperqb-ui
-        continue-on-error: true
+          cd HyperRUSTY
+          # Remove AutoHyper submodule completely
+          git submodule deinit -f AutoHyper 2>/dev/null || true
+          git rm -f AutoHyper 2>/dev/null || true
+          rm -rf .git/modules/AutoHyper 2>/dev/null || true
+          rm -rf AutoHyper 2>/dev/null || true
+
+          # Clear any remaining submodule references
+          git config --remove-section submodule.AutoHyper 2>/dev/null || true
+
+          echo "Cleaned up AutoHyper submodule"
+          cd ..
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -70,21 +79,6 @@ jobs:
           echo "Z3_STATIC=1" >> $GITHUB_ENV
           echo "PKG_CONFIG_ALL_STATIC=1" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=" >> $GITHUB_ENV
-
-      - name: Debug submodule contents
-        run: |
-          echo "=== Current directory ==="
-          pwd
-          ls -la
-
-          echo "=== HyperRUSTY directory contents ==="
-          ls -la HyperRUSTY/
-
-          echo "=== Looking for Cargo.toml ==="
-          find . -name "Cargo.toml" -type f
-
-          echo "=== Git submodule status ==="
-          git submodule status
 
       - name: Build binary (static)
         run: |

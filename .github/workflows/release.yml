@@ -16,23 +16,12 @@ jobs:
       - name: Checkout with submodules
         uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: false
           token: ${{ secrets.PAT_TOKEN }}
 
-      - name: Clean up HyperRUSTY submodules
+      - name: Init only necessary submodules
         run: |
-          cd HyperRUSTY
-          # Remove AutoHyper submodule completely
-          git submodule deinit -f AutoHyper 2>/dev/null || true
-          git rm -f AutoHyper 2>/dev/null || true
-          rm -rf .git/modules/AutoHyper 2>/dev/null || true
-          rm -rf AutoHyper 2>/dev/null || true
-
-          # Clear any remaining submodule references
-          git config --remove-section submodule.AutoHyper 2>/dev/null || true
-
-          echo "Cleaned up AutoHyper submodule"
-          cd ..
+          git submodule update --init -- hyperqb-ui HyperRUSTY
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable

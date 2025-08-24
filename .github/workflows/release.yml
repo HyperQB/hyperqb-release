@@ -24,6 +24,7 @@ jobs:
         run: |
           git config --global url."https://${{ secrets.PAT_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
+      # Leave AutoHyper out when getting submodules
       - name: Init only needed submodules
         run: |
           git submodule update --init -- HyperRUSTY hyperqb-ui

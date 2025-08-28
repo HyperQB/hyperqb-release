@@ -83,15 +83,15 @@ jobs:
       - name: Verify static linking
         run: |
           echo "=== Checking for dynamic Z3 dependencies ==="
-          if otool -L HyperRUSTY/target/release/sim | grep -v "HyperRUSTY/target/release/sim:" | grep -i z3; then
+          if otool -L HyperRUSTY/target/release/HyperRUSTY | grep -v "HyperRUSTY/target/release/HyperRUSTY:" | grep -i z3; then
             echo "ERROR: Binary has Z3 dynamic dependencies:"
-            otool -L HyperRUSTY/target/release/sim | grep -i z3
+            otool -L HyperRUSTY/target/release/HyperRUSTY | grep -i z3
             exit 1
           else
             echo "No Z3 dynamic dependencies found - binary is statically linked"
           fi
           echo "=== Full dependency list ==="
-          otool -L HyperRUSTY/target/release/sim
+          otool -L HyperRUSTY/target/release/HyperRUSTY
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2
@@ -111,8 +111,8 @@ jobs:
       - name: Copy binary to assets
         run: |
           mkdir -p hyperqb-ui/assets/bin/
-          cp HyperRUSTY/target/release/sim hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/sim
-          chmod +x hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/sim
+          cp HyperRUSTY/target/release/HyperRUSTY hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/HyperRUSTY
+          chmod +x hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/HyperRUSTY
 
       - name: Download and install oss-cad-suite
         run: |

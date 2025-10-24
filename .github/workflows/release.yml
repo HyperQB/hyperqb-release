@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-release:
-    runs-on: macos-latest
+    runs-on: macos-15
     defaults:
       run:
         shell: bash
@@ -50,8 +50,8 @@ jobs:
           git clone https://github.com/Z3Prover/z3.git z3
           cd z3
           # Pin to a specific commit/tag
-          git checkout z3-4.12.4
-          echo "z3-4.12.4" > ../z3-version.txt
+          git checkout z3-4.13.0
+          echo "z3-4.13.0" > ../z3-version.txt
           python3 scripts/mk_make.py --prefix=/usr/local --staticlib
           cd build
           make -j$(sysctl -n hw.ncpu)
@@ -65,7 +65,7 @@ jobs:
 
       - name: Create Z3 version file (for cache key)
         if: steps.cache-z3.outputs.cache-hit == 'true'
-        run: echo "z3-4.12.4" > z3-version.txt
+        run: echo "z3-4.13.0" > z3-version.txt
 
       - name: Set environment for static linking
         run: |

@@ -34,3 +34,10 @@ Replace `/path/to/` with the actual path to where you placed the app.
 - **Still won't open?** Try moving the app to your Applications folder first
 - **"Damaged" error?** The download may have been corrupted - try downloading again
 - **Permission issues?** Make sure you have admin rights on your Mac
+
+## Command Line Alternative
+
+You can also interact with the HyperQB binary through the command line.
+A helper script is included to automatically locate and run the binary inside the .app bundle.
+
+Use `./hyperqb.sh [options]`. For help use `./hyperqb.sh --help`

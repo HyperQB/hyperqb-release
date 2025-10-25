@@ -130,8 +130,9 @@ jobs:
           cp -r oss-cad-suite hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/
 
       - name: Copy Installation Guide & Script
-        run: cp INSTALL.md hyperqb-ui/build/macos/Build/Products/Release/"MacOS Installation Instructions.txt"
-        run: cp hyperqb.sh hyperqb-ui/build/macos/Build/Products/Release/hyperqb.sh
+        run: |
+          cp INSTALL.md hyperqb-ui/build/macos/Build/Products/Release/"MacOS Installation Instructions.txt"
+          cp hyperqb.sh hyperqb-ui/build/macos/Build/Products/Release/hyperqb.sh
 
       - name: Zip App Bundle
         run: |

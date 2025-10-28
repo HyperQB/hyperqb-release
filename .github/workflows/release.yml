@@ -129,13 +129,15 @@ jobs:
           # Copy the entire oss-cad-suite directory to the app bundle
           cp -r oss-cad-suite hyperqb-ui/build/macos/Build/Products/Release/hyperqb.app/Contents/Resources/
 
-      - name: Copy Installation Guide
-        run: cp INSTALL.md hyperqb-ui/build/macos/Build/Products/Release/"MacOS Installation Instructions.txt"
+      - name: Copy Installation Guide & Script
+        run: |
+          cp INSTALL.md hyperqb-ui/build/macos/Build/Products/Release/"MacOS Installation Instructions.txt"
+          cp hyperqb.sh hyperqb-ui/build/macos/Build/Products/Release/hyperqb.sh
 
       - name: Zip App Bundle
         run: |
           cd hyperqb-ui/build/macos/Build/Products/Release/
-          zip -r HyperQB-macos.zip HyperQB.app "MacOS Installation Instructions.txt"
+          zip -r HyperQB-macos.zip HyperQB.app "MacOS Installation Instructions.txt" hyperqb.sh
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

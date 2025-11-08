@@ -59,6 +59,8 @@ jobs:
           cd ../..
           # Verify static library exists
           ls -la /usr/local/lib/libz3.a
+          # Remove any dynamic libraries to force static linking
+          sudo rm -f /usr/local/lib/libz3.dylib* || true
           ls -la /usr/local/lib/libz3*
 
       - name: Create Z3 version file (for cache key)

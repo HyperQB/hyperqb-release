@@ -70,8 +70,18 @@ jobs:
           echo "PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/lib/pkgconfig" >> $GITHUB_ENV
           echo "Z3_SYS_Z3_HEADER=/usr/local/include/z3.h" >> $GITHUB_ENV
           echo "Z3_STATIC=1" >> $GITHUB_ENV
-          echo "PKG_CONFIG_ALL_STATIC=1" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=" >> $GITHUB_ENV
+
+      - name: Debug Z3 build
+        run: |
+          echo "=== Z3 files ==="
+          ls -l /usr/local/lib/libz3*
+          echo "=== Architecture ==="
+          file /usr/local/lib/libz3.a || true
+          echo "=== pkg-config output ==="
+          pkg-config --static --libs z3 || true
+          echo "=== Rust target ==="
+          rustc -vV | grep host
 
       - name: Build binary (static)
         run: |

@@ -52,7 +52,7 @@ jobs:
           # Pin to a specific commit/tag
           git checkout z3-4.13.0
           echo "z3-4.13.0" > ../z3-version.txt
-          python3 scripts/mk_make.py --prefix=/usr/local --staticlib
+          CFLAGS="-arch arm64" CXXFLAGS="-arch arm64" python3 scripts/mk_make.py --prefix=/usr/local --staticlib
           cd build
           make -j$(sysctl -n hw.ncpu)
           sudo make install

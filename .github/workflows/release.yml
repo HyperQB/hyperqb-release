@@ -52,7 +52,7 @@ jobs:
           # Pin to a specific commit/tag
           git checkout z3-4.13.0
           echo "z3-4.13.0" > ../z3-version.txt
-          CFLAGS="-arch arm64" CXXFLAGS="-arch arm64" python3 scripts/mk_make.py --prefix=/usr/local --staticlib
+          CFLAGS="-arch arm64" CXXFLAGS="-arch arm64" ARCHFLAGS="-arch arm64" python3 scripts/mk_make.py --prefix=/usr/local --staticlib
           cd build
           make -j$(sysctl -n hw.ncpu)
           sudo make install
@@ -72,20 +72,12 @@ jobs:
           echo "Z3_STATIC=1" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=" >> $GITHUB_ENV
 
-      - name: Debug Z3 build
-        run: |
-          echo "=== Z3 files ==="
-          ls -l /usr/local/lib/libz3*
-          echo "=== Architecture ==="
-          file /usr/local/lib/libz3.a || true
-          echo "=== pkg-config output ==="
-          pkg-config --static --libs z3 || true
-          echo "=== Rust target ==="
-          rustc -vV | grep host
-
       - name: Build binary (static)
         run: |
           cd HyperRUSTY
+          export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/lib/pkgconfig
+          export Z3_STATIC=1
+          export RUSTFLAGS="-L/usr/local/lib -C link-arg=-lz3"
           cargo build --release
 
       - name: Verify static linking
